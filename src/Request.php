@@ -71,10 +71,13 @@ class Request {
         }
 
         // Prepare body content (if any)
+        // TODO - Allow other Content-Types than JSON
         $body = $this->params["body"];
         if (is_array($body)) {
-            $parsedbody = http_build_query($this->params["body"]);
+            $parsedbody = json_encode($this->params["body"]);
             $body = $parsedbody;
+            array_push($headers,'Content-Type: application/json');
+            array_push($headers,'Content-Length: ' . strlen($body));
         }
 
         // Prepare url
