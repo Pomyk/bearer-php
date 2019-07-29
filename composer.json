@@ -1,0 +1,34 @@
+{
+  "name": "bearer/bearer-php",
+  "description": "The Bearer PHP client helps you call any API in minutes with out-of-the-box managed authentication and log monitoring.",
+  "authors": [
+    {
+      "name": "bearer",
+      "email": "support@bearer.sh",
+      "homepage": "https://www.bearer.sh",
+      "role": "Vendor"
+    }
+  ],
+  "support": {
+    "email": "support@bearer.sh",
+    "issues": "http://github.com/bearer/bearer-php/issues",
+    "source": "http://github.com/bearer/bearer-php"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.5.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bearer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Bearer\\Tests\\": "tests/"
+    }
+  }
+}
