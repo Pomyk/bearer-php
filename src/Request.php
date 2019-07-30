@@ -39,10 +39,10 @@ class Request {
         
         if(is_array($headers)) {
             $preheaders = [];
-            foreach ($headers as $header) {
-                $preheader = "Bearer-Proxy-" . $header;
+            foreach ($headers as $key => $value) {
+                $preheader = "Bearer-Proxy-" . $key . ": " . $value;
                 array_push($preheaders, $preheader);
-            } 
+            }
             $headers = $preheaders;
         } else {
             $headers = [];
