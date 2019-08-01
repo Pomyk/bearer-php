@@ -12,12 +12,16 @@ class Request {
     public function __construct($method, $path, $params, $config)
     {
 
-        if (is_null($config['bearerApiKey'])) {
-            throw new \Exception('Unable to perform the request. Missing the Bearer API Key.');
+        if (!array_key_exists("bearerApiKey", $config)) {
+            throw new \Exception('Bearer was unable to perform the API call. Your Bearer API Key is missing.');
+        }
+
+        if (!array_key_exists("integrationId", $config)) {
+            throw new \Exception('Bearer was unable to perform the API call. The integration ID is missing.');
         }
 
         if (!in_array($method, ['HEAD','GET','POST','PUT','PATCH','DELETE'])) {
-            throw new \Exception("Unable to perform the request. Unsupported request method.");
+            throw new \Exception("Bearer was unable to perform the API call. Unsupported request method.");
         }
 
         $this->method = $method;
@@ -35,7 +39,7 @@ class Request {
         $curl = curl_init();
 
         // Work with provided headers
-        $headers = $this->params['headers'];
+        $headers = array_key_exists('headers', $this->params) ? $this->params['headers'] : false;
         
         if(is_array($headers)) {
             $preheaders = [];
@@ -50,30 +54,27 @@ class Request {
 
         // Handle auth
         $bearerApiKey = $this->config["bearerApiKey"];
-        $setupId = $this->config["setupId"];
-        $authId = $this->config["authId"];
-
         array_push($headers, "Authorization: $bearerApiKey");
 
-        if (!is_null($setupId)) {
-            array_push($headers,"Bearer-Setup-Id: $setupId");
+        if (array_key_exists("setupId", $this->config)) {
+            array_push($headers,"Bearer-Setup-Id: " . $this->config["setupId"]);
         }
 
-        if (!is_null($authId)) {
-            array_push($headers,"Bearer-Auth-Id: $authId");
+        if (array_key_exists("authId", $this->config)) {
+            array_push($headers,"Bearer-Auth-Id: " . $this->config["authId"]);
         }
 
         // Prepare query parameters
         $query = "";
-        if (is_array($this->params["query"])) {
+        if (array_key_exists("query", $this->params) && is_array($this->params["query"])) {
             $querystring = http_build_query($this->params["query"]);
             $query = (preg_match("/\?/", $this->path) ? "&" : "?") . $querystring;
         }
 
         // Prepare body content (if any)
         // TODO - Allow other Content-Types than JSON
-        $body = $this->params["body"];
-        if (is_array($body)) {
+        $body = "";
+        if (array_key_exists("body", $this->params) && is_array($this->params["body"])) {
             $parsedbody = json_encode($this->params["body"]);
             $body = $parsedbody;
             array_push($headers,'Content-Type: application/json');
