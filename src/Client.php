@@ -4,6 +4,8 @@ namespace Bearer;
 
 class Client {
 
+    static $VERSION = "1.0.1";
+
     protected $bearerApiKey;
     protected $host = 'https://int.bearer.sh';
     protected $path = '/api/v4/functions/backend';

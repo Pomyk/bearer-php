@@ -89,6 +89,7 @@ class Request {
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERAGENT, $this->getUserAgent());
         curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         
@@ -104,6 +105,10 @@ class Request {
 
     public function getResponse() {
         return $this->response;
+    }
+
+    protected function getUserAgent() {
+        return "Bearer for PHP (". \Bearer\Client::$VERSION ."); PHP (" . PHP_VERSION . ");";
     }
 
 }
