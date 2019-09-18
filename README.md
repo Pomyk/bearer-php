@@ -16,12 +16,12 @@ You can install the package manually or by adding it to your `composer.json`:
 
 ## Usage
 
-Get your Bearer [API Key](https://app.bearer.sh/keys) and integration id from the [Dashboard](https://app.bearer.sh) and use the Bearer client as follows:
+Get your Bearer [Secret Key](https://app.bearer.sh/keys) and integration id from the [Dashboard](https://app.bearer.sh) and use the Bearer client as follows:
 
 ### Calling any APIs
 
 ```php
-$bearer = new Bearer\Client('YOUR_BEARER_API_KEY'); // find it on https://app.bearer.sh/keys
+$bearer = new Bearer\Client('BEARER_SECRET_KEY'); // find it on https://app.bearer.sh/keys
 
 $api = $bearer->integration('api_name');
 $api->get('/api-endpoint');
@@ -34,7 +34,7 @@ $api->get('/api-endpoint');
 ### Passing query parameters
 
 ```php
-$bearer = new Bearer\Client('YOUR_BEARER_API_KEY'); // find it on https://app.bearer.sh/keys
+$bearer = new Bearer\Client('BEARER_SECRET_KEY'); // find it on https://app.bearer.sh/keys
 
 $github = $bearer->integration('github');
 $github->get('/users/bearer/repos', [ "query" => [ "direction" => "desc" ] ]);
@@ -43,7 +43,7 @@ $github->get('/users/bearer/repos', [ "query" => [ "direction" => "desc" ] ]);
 ### Authenticating users
 
 ```php
-$bearer = new Bearer\Client('YOUR_BEARER_API_KEY'); // find it on https://app.bearer.sh/keys
+$bearer = new Bearer\Client('BEARER_SECRET_KEY'); // find it on https://app.bearer.sh/keys
 
 $github = $bearer->integration('github');
 $github
@@ -56,7 +56,7 @@ $github
 The following methods are available out-of-the-box: `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS`. If you want to dynamically perform requests, use the `request($method)` function:
 
 ```php
-$bearer = new Bearer\Client('YOUR_BEARER_API_KEY'); // find it on https://app.bearer.sh/keys
+$bearer = new Bearer\Client('BEARER_SECRET_KEY'); // find it on https://app.bearer.sh/keys
 
 $github = $bearer->integration('github');
 $github
@@ -67,7 +67,7 @@ $github
 ## Calling custom functions
 
 ```php
-$bearer = new Bearer\Client('YOUR_BEARER_API_KEY');
+$bearer = new Bearer\Client('BEARER_SECRET_KEY');
 
 $integration = $bearer->integration('integration_id');
 $integration->invoke('functionName');
