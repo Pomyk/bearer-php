@@ -74,3 +74,12 @@ $integration->invoke('functionName');
 ```
 
 [Learn more](https://docs.bearer.sh/working-with-bearer/manipulating-apis) on how to use custom functions with Bearer.sh.
+
+## Development
+
+Install [composer](https://getcomposer.org/)
+```bash
+$ composer install
+# run tests
+$ vendor/bin/phpunit tests
+```

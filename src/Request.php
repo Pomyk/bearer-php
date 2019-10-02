@@ -8,8 +8,10 @@ class Request {
     private $path;
     private $params; // request parameters (headers, query or body)
     private $config;
+    private $timeout;
+    private $connectTimeout;
 
-    public function __construct($method, $path, $params, $config)
+    public function __construct($method, $path, $params, $config, $timeout = 5, $connectTimeout = 5)
     {
 
         if (!array_key_exists("bearerApiKey", $config)) {
@@ -29,6 +31,8 @@ class Request {
         $this->params = $params;
 
         $this->config = $config;
+        $this->timeout = $timeout ?? 5;
+        $this->connectTimeout = $connectTimeout ?? 5;
         $this->make();
 
         return $this;
@@ -40,7 +44,7 @@ class Request {
 
         // Work with provided headers
         $headers = array_key_exists('headers', $this->params) ? $this->params['headers'] : false;
-        
+
         if(is_array($headers)) {
             $preheaders = [];
             foreach ($headers as $key => $value) {
@@ -93,13 +97,15 @@ class Request {
         curl_setopt($curl, CURLOPT_USERAGENT, $this->getUserAgent());
         curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        
+        curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $this->connectTimeout);
+
         $this->response = curl_exec($curl);
 
         if(!$this->response){
             throw new \Exception("\nThe Bearer client wasn't able to perform the request to $url.\nPlease check you are connected to the internet before trying again.\n");
         }
-        
+
         curl_close($curl);
         return $this;
     }

@@ -13,7 +13,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         global $config;
         $this->testConfig = $config;
-        
     }
 
     public function testMakesGetRequest() {
@@ -24,5 +23,4 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(!is_null($this->testClient->getResponse()));
     }
-    
 }
