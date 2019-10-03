@@ -8,15 +8,16 @@ class Integration {
     protected $authId;
     protected $setupId;
 
-    public function __construct($integrationId, $bearerApiKey, $baseUrl) {
+    public function __construct($integrationId, $bearerApiKey, $baseUrl, $timeout = 5, $connectTimeout = 5) {
         $this->config = [
             "integrationId" => $integrationId,
             "bearerApiKey" => $bearerApiKey,
-            "baseUrl" => $baseUrl
+            "baseUrl" => $baseUrl,
+            "timeout" => $timeout ?? 5,
+            "connectTimeout" => $connectTimeout ?? 5
         ];
     }
 
-    
     /* Handle users authentication */
 
     public function auth($authId) {
@@ -44,7 +45,6 @@ class Integration {
         if ($this->setupId) {
             $config['setupId'] = $this->setupId;
         }
-        
         return $config;
     }
 
@@ -62,7 +62,7 @@ class Integration {
         $request = new Request($method, $path, $params, $this->getConfig());
         return $request->getResponse();
     }
-    
+
     /* Invoke a user's function */
 
     public function invoke ($functionName, $params = []) {

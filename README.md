@@ -64,13 +64,16 @@ $github
     ->request('PUT', '/user/starred/bearer/bearer', [ "headers" => [ "Content-Length" => 0 ] ]);
 ```
 
-## Calling custom functions
+### Setting the request timeout
 
-```php
-$bearer = new Bearer\Client('BEARER_SECRET_KEY');
+By default Bearer client request and connection timeouts are set to 5 seconds. Bearer allows to increase the request timeout to up to 30 seconds
+
+``` php
+$bearer = new Bearer\Client('BEARER_SECRET_KEY', 20, 10); // set timeout to 20 seconds and connectTimeout to 10 seconds
 
 $integration = $bearer->integration('integration_id');
 $integration->invoke('functionName');
+
 ```
 
 [Learn more](https://docs.bearer.sh/working-with-bearer/manipulating-apis) on how to use custom functions with Bearer.sh.

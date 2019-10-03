@@ -11,7 +11,7 @@ class Request {
     private $timeout;
     private $connectTimeout;
 
-    public function __construct($method, $path, $params, $config, $timeout = 5, $connectTimeout = 5)
+    public function __construct($method, $path, $params, $config)
     {
 
         if (!array_key_exists("bearerApiKey", $config)) {
@@ -89,6 +89,8 @@ class Request {
         $baseUrl = $this->config['baseUrl'];
         $integrationId = $this->config['integrationId'];
         $url = $baseUrl . "/" . $integrationId . "/" . $this->path . $query;
+        $timeout = $this->config["timeout"];
+        $connectTimeout = $this->config["connectTimeout"];
 
         // Make request
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -97,8 +99,8 @@ class Request {
         curl_setopt($curl, CURLOPT_USERAGENT, $this->getUserAgent());
         curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_TIMEOUT, $this->timeout);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $this->connectTimeout);
+        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $connectTimeout);
 
         $this->response = curl_exec($curl);
 
