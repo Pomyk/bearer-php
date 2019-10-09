@@ -9,7 +9,7 @@ You can install the package manually or by adding it to your `composer.json`:
 ```json
 {
   "require": {
-    "bearer/bearer-php": "^1.0.0"
+    "bearer/bearer-php": "^2.0.0"
   }
 }
 ```
@@ -66,12 +66,12 @@ $github
 
 ### Setting the request timeout
 
-By default Bearer client request and connection timeouts are set to 5 seconds. Bearer allows to increase the request timeout to up to 30 seconds
+You can customize your http client by specifying httpClientSettings as a Bearer\Client or $bearer-integration parameter. By default Bearer client request and connection timeouts are set to 5 seconds. Bearer allows to increase the request timeout to up to 30 seconds
 
 ``` php
-$bearer = new Bearer\Client('BEARER_SECRET_KEY', 20, 10); // set timeout to 20 seconds and connectTimeout to 10 seconds
+$bearer = new Bearer\Client('BEARER_SECRET_KEY', [CURLOPT_TIMEOUT => 10]); // sets timeout to 10 seconds
 
-$integration = $bearer->integration('integration_id');
+$integration = $bearer->integration('integration_id', [CURLOPT_CONNECTTIMEOUT => 1]); // sets connect timeout to 1 second
 $integration->invoke('functionName');
 
 ```

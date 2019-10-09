@@ -2,50 +2,60 @@
 
 namespace Bearer;
 
-class Client {
+class Client
+{
 
-    static $VERSION = "1.1.0";
+    static $VERSION = "2.0.0";
 
-    protected $bearerApiKey;
-    protected $timeout = 5;
-    protected $connectTimeout = 5;
+    protected $secretKey;
     protected $host = 'https://int.bearer.sh';
-    protected $path = '/api/v4/functions/backend';
+    protected $httpClientSettings;
 
-    public function __construct ($bearerApiKey, $timeout = 5, $connectTimeout = 5) {
-        $this->setApiKey($bearerApiKey);
-        $this->setTimeout($timeout);
-        $this->setConnectTimeout($connectTimeout);
+    public function __construct($secretKey, $httpClientSettings = [CURLOPT_TIMEOUT => 5, CURLOPT_CONNECTTIMEOUT => 5])
+    {
+        $this->setSecretKey($secretKey);
+        $this->setHttpClientSettings($httpClientSettings);
         return $this;
     }
 
-    public function setApiKey ($apiKey) {
-        $this->bearerApiKey = $apiKey;
+    public function setSecretKey($apiKey)
+    {
+        $this->secretKey = $apiKey;
         return $this;
     }
 
-    public function setHost ($host) {
+    public function setApiKey($apiKey)
+    {
+        trigger_error('Please use Bearer\Client::setApiKey. Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        $this->secretKey = $apiKey;
+        return $this;
+    }
+
+    public function setHost($host)
+    {
         $this->host = $host;
         return $this;
     }
 
-    public function setTimeout ($timeout) {
-        $this->timeout = $timeout;
+    public function setHttpClientSettings($httpClientSettings)
+    {
+        $this->httpClientSettings = $httpClientSettings;
         return $this;
     }
 
-    public function setConnectTimeout ($connectTimeout) {
-        $this->connectTimeout = $connectTimeout;
-        return $this;
-    }
+    public function integration($id, $httpClientSettings = [])
+    {
+        if (is_array($httpClientSettings)) {
+            $httpClientSettings = array_replace($this->httpClientSettings, $httpClientSettings);
+        } else {
+            $httpClientSettings = [];
+        }
 
-    public function integration ($id) {
         return new Integration(
             $id,
-            $this->bearerApiKey,
-            $this->host . $this->path,
-            $this->timeout,
-            $this->connectTimeout
+            $this->secretKey,
+            $this->host,
+            $httpClientSettings
         );
     }
 }

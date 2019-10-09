@@ -2,9 +2,10 @@
 
 $config = [
     'host' => 'https://int.bearer.sh',
-    'path' => '/api/v4/functions/backend',
-    'bearerApiKey' => 'foo:bar',
+    'secretKey' => 'foo:bar',
     'integrationId' => '1a2b3c',
-    'timeout' => 5,
-    'connectTimeout' => 5
+    'httpClientSettings' => [
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 5
+    ]
 ];

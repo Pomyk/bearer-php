@@ -2,19 +2,17 @@
 
 namespace Bearer;
 
-class Request {
-
+class Request
+{
     private $method;
     private $path;
     private $params; // request parameters (headers, query or body)
     private $config;
-    private $timeout;
-    private $connectTimeout;
 
     public function __construct($method, $path, $params, $config)
     {
 
-        if (!array_key_exists("bearerApiKey", $config)) {
+        if (!array_key_exists("secretKey", $config)) {
             throw new \Exception('Bearer was unable to perform the API call. Your Bearer API Key is missing.');
         }
 
@@ -22,7 +20,7 @@ class Request {
             throw new \Exception('Bearer was unable to perform the API call. The integration ID is missing.');
         }
 
-        if (!in_array($method, ['HEAD','GET','POST','PUT','PATCH','DELETE'])) {
+        if (!in_array($method, ['HEAD', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'])) {
             throw new \Exception("Bearer was unable to perform the API call. Unsupported request method.");
         }
 
@@ -31,8 +29,6 @@ class Request {
         $this->params = $params;
 
         $this->config = $config;
-        $this->timeout = $timeout ?? 5;
-        $this->connectTimeout = $connectTimeout ?? 5;
         $this->make();
 
         return $this;
@@ -45,10 +41,9 @@ class Request {
         // Work with provided headers
         $headers = array_key_exists('headers', $this->params) ? $this->params['headers'] : false;
 
-        if(is_array($headers)) {
+        if (is_array($headers)) {
             $preheaders = [];
             foreach ($headers as $key => $value) {
-                $preheader = "Bearer-Proxy-" . $key . ": " . $value;
                 array_push($preheaders, $preheader);
             }
             $headers = $preheaders;
@@ -57,15 +52,15 @@ class Request {
         }
 
         // Handle auth
-        $bearerApiKey = $this->config["bearerApiKey"];
-        array_push($headers, "Authorization: $bearerApiKey");
-
-        if (array_key_exists("setupId", $this->config)) {
-            array_push($headers,"Bearer-Setup-Id: " . $this->config["setupId"]);
-        }
+        $secretKey = $this->config["secretKey"];
+        array_push($headers, "Authorization: $secretKey");
 
         if (array_key_exists("authId", $this->config)) {
-            array_push($headers,"Bearer-Auth-Id: " . $this->config["authId"]);
+            array_push($headers, "Bearer-Auth-Id: " . $this->config["authId"]);
+        }
+
+        if (array_key_exists("setupId", $this->config)) {
+            array_push($headers, "Bearer-Setup-Id: " . $this->config["setupId"]);
         }
 
         // Prepare query parameters
@@ -81,16 +76,14 @@ class Request {
         if (array_key_exists("body", $this->params) && is_array($this->params["body"])) {
             $parsedbody = json_encode($this->params["body"]);
             $body = $parsedbody;
-            array_push($headers,'Content-Type: application/json');
-            array_push($headers,'Content-Length: ' . strlen($body));
+            array_push($headers, 'Content-Type: application/json');
+            array_push($headers, 'Content-Length: ' . strlen($body));
         }
 
         // Prepare url
         $baseUrl = $this->config['baseUrl'];
         $integrationId = $this->config['integrationId'];
         $url = $baseUrl . "/" . $integrationId . "/" . $this->path . $query;
-        $timeout = $this->config["timeout"];
-        $connectTimeout = $this->config["connectTimeout"];
 
         // Make request
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -99,12 +92,18 @@ class Request {
         curl_setopt($curl, CURLOPT_USERAGENT, $this->getUserAgent());
         curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $connectTimeout);
+
+        $httpClientSettings = array_key_exists('httpClientSettings', $this->config) ? $this->config['httpClientSettings'] : false;
+
+        if (is_array($httpClientSettings)) {
+            foreach ($httpClientSettings as $key => $value) {
+                curl_setopt($curl, $key, $value);
+            }
+        }
 
         $this->response = curl_exec($curl);
 
-        if(!$this->response){
+        if (!$this->response) {
             throw new \Exception("\nThe Bearer client wasn't able to perform the request to $url.\nPlease check you are connected to the internet before trying again.\n");
         }
 
@@ -112,12 +111,13 @@ class Request {
         return $this;
     }
 
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->response;
     }
 
-    protected function getUserAgent() {
-        return "Bearer for PHP (". \Bearer\Client::$VERSION ."); PHP (" . PHP_VERSION . ");";
+    protected function getUserAgent()
+    {
+        return "Bearer for PHP (" . \Bearer\Client::$VERSION . "); PHP (" . PHP_VERSION . ");";
     }
-
 }

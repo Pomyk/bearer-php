@@ -14,17 +14,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         global $config;
         $this->testConfig = $config;
 
-        $this->testClient = new Bearer\Client($this->testConfig['bearerApiKey']);
+        $this->testClient = new Bearer\Client($this->testConfig['secretKey']);
     }
 
     public function testDefaultHost()
     {
         $this->assertAttributeEquals($this->testConfig['host'], "host", $this->testClient);
-    }
-
-    public function testDefaultPath()
-    {
-        $this->assertAttributeEquals($this->testConfig['path'], "path", $this->testClient);
     }
 
     public function testSetUpIntegration()

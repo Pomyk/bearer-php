@@ -1,0 +1,25 @@
+kind: pipeline
+name: Bearer-PHP
+
+clone:
+  depth: 50
+
+steps:
+  - name: install dependencies
+    image: composer:1.9.0
+    commands:
+      - composer install
+    when:
+      event:
+        - pull_request
+        - push
+
+  - name: test
+    image: composer:1.9.0
+    environment:
+    commands:
+      - vendor/bin/phpunit tests
+    when:
+      event:
+        - pull_request
+        - push
