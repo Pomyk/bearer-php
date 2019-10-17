@@ -71,8 +71,8 @@ You can customize your http client by specifying httpClientSettings as a Bearer\
 ``` php
 $bearer = new Bearer\Client('BEARER_SECRET_KEY', [CURLOPT_TIMEOUT => 10]); // sets timeout to 10 seconds
 
-$integration = $bearer->integration('integration_id', [CURLOPT_CONNECTTIMEOUT => 1]); // sets connect timeout to 1 second
-$integration->invoke('functionName');
+$github = $bearer->integration('github', [CURLOPT_CONNECTTIMEOUT => 1]); // sets connect timeout to 1 second
+$github->get('/repos', [ "query" => [ "direction" => "desc" ] ]);
 
 ```
 
