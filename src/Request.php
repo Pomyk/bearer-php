@@ -8,7 +8,7 @@ class Request
     private $path;
     private $params; // request parameters (headers, query or body)
     private $config;
-
+    private $logger;
     public function __construct($method, $path, $params, $config)
     {
 
@@ -27,8 +27,9 @@ class Request
         $this->method = $method;
         $this->path = $path;
         $this->params = $params;
-
         $this->config = $config;
+        $this->logger = new \Monolog\Logger("bearer");
+        $this->logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
         $this->make();
 
         return $this;
@@ -92,6 +93,21 @@ class Request
         curl_setopt($curl, CURLOPT_USERAGENT, $this->getUserAgent());
         curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, true);
+        curl_setopt(
+            $curl,
+            CURLOPT_HEADERFUNCTION,
+            function ($curl, $header) use (&$responseHeaders) {
+                $len = strlen($header);
+                $header = explode(':', $header, 2);
+                if (count($header) < 2) // ignore invalid headers
+                    return $len;
+
+                $responseHeaders[strtolower(trim($header[0]))][] = trim($header[1]);
+
+                return $len;
+            }
+        );
 
         $httpClientSettings = array_key_exists('httpClientSettings', $this->config) ? $this->config['httpClientSettings'] : false;
 
@@ -101,7 +117,19 @@ class Request
             }
         }
 
+        $this->logger->debug(
+            "sending request".
+            "url: " . $url . "," .
+            "method:" . $this->method . "," .
+            "params:" . $query . "," .
+            "body: " . $body . "," .
+            "headers: " . json_encode($headers) . "," .
+            "http_client_settings: " . json_encode($httpClientSettings)
+        );
+
         $this->response = curl_exec($curl);
+
+        $this->logger->info("request id: " . $responseHeaders["bearer-request-id"][0]);
 
         if (!$this->response) {
             throw new \Exception("\nThe Bearer client wasn't able to perform the request to $url.\nPlease check you are connected to the internet before trying again.\n");
@@ -109,6 +137,11 @@ class Request
 
         curl_close($curl);
         return $this;
+    }
+
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     public function getResponse()
