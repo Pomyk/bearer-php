@@ -1,7 +1,7 @@
 <?php
 
 $config = [
-    'host' => 'https://int.bearer.sh',
+    'host' => 'https://proxy.bearer.sh',
     'secretKey' => 'foo:bar',
     'integrationId' => '1a2b3c',
     'httpClientSettings' => [
