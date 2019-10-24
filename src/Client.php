@@ -5,10 +5,10 @@ namespace Bearer;
 class Client
 {
 
-    static $VERSION = "2.0.0";
+    static $VERSION = "2.0.1";
 
     protected $secretKey;
-    protected $host = 'https://int.bearer.sh';
+    protected $host = 'https://proxy.bearer.sh';
     protected $httpClientSettings;
 
     public function __construct($secretKey, $httpClientSettings = [CURLOPT_TIMEOUT => 5, CURLOPT_CONNECTTIMEOUT => 5])
