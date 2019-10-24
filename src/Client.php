@@ -11,10 +11,19 @@ class Client
     protected $host = 'https://proxy.bearer.sh';
     protected $httpClientSettings;
 
+    static public $defaultOptions = [
+        'maxNetworkRetries' => 0,
+        'maxNetworkRetryDelay' => 2,
+        'initialNetworkRetryDelay' => 0.5,
+    ];
+
+    protected $options = [];
+
     public function __construct($secretKey, $httpClientSettings = [CURLOPT_TIMEOUT => 5, CURLOPT_CONNECTTIMEOUT => 5])
     {
         $this->setSecretKey($secretKey);
         $this->setHttpClientSettings($httpClientSettings);
+        $this->setOptions(self::$defaultOptions);
         return $this;
     }
 
@@ -26,7 +35,7 @@ class Client
 
     public function setApiKey($apiKey)
     {
-        trigger_error('Please use Bearer\Client::setApiKey. Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+        trigger_error('Please use Bearer\Client::setSecretKey. Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
         $this->secretKey = $apiKey;
         return $this;
     }
@@ -37,9 +46,28 @@ class Client
         return $this;
     }
 
+    protected function setOptions(array $options) {
+        $this->options = $options;
+    }
+
     public function setHttpClientSettings($httpClientSettings)
     {
         $this->httpClientSettings = $httpClientSettings;
+        return $this;
+    }
+
+    public function setMaxNetworkRetries($maxRetries) {
+        $this->options['maxNetworkRetries'] = $maxRetries;
+        return $this;
+    }
+
+    public function setMaxNetworkRetryDelay($maxRetryDelay) {
+        $this->options['maxNetworkRetryDelay'] = $maxRetryDelay;
+        return $this;
+    }
+
+    public function setInitialNetworkRetryDelay($initialRetryDelay) {
+        $this->options['initialNetworkRetryDelay'] = $initialRetryDelay;
         return $this;
     }
 
@@ -55,7 +83,8 @@ class Client
             $id,
             $this->secretKey,
             $this->host,
-            $httpClientSettings
+            $httpClientSettings,
+            $this->options
         );
     }
 }

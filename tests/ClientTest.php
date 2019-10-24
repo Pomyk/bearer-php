@@ -2,8 +2,6 @@
 namespace Bearer\Tests;
 use Bearer;
 
-require '_config.php';
-
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
     private $testClient;
@@ -11,8 +9,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        global $config;
-        $this->testConfig = $config;
+        $this->testConfig = require '_config.php';
 
         $this->testClient = new Bearer\Client($this->testConfig['secretKey']);
     }

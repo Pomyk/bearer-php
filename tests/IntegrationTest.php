@@ -4,8 +4,6 @@ namespace Bearer\Tests;
 
 use Bearer;
 
-require '_config.php';
-
 class IntegrationTest extends \PHPUnit_Framework_TestCase
 {
     private $testIntegration;
@@ -13,8 +11,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        global $config;
-        $this->testConfig = $config;
+        $this->testConfig = require '_config.php';
 
         $client = new Bearer\Client($this->testConfig['secretKey']);
         $this->testIntegration = $client->integration($this->testConfig['integrationId']);

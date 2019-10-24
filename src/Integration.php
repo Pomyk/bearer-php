@@ -9,13 +9,17 @@ class Integration
     protected $authId;
     protected $setupId;
 
-    public function __construct($integrationId, $secretKey, $baseUrl, $httpClientSettings)
+    public function __construct($integrationId, $secretKey, $baseUrl, $httpClientSettings, $options = [])
     {
+        if ($options === []) {
+            $options = Client::$defaultOptions;
+        }
         $this->config = [
             "integrationId" => $integrationId,
             "secretKey" => $secretKey,
             "baseUrl" => $baseUrl,
-            "httpClientSettings" => $httpClientSettings
+            "httpClientSettings" => $httpClientSettings,
+            "options" => $options,
         ];
     }
 
