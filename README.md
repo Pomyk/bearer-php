@@ -76,6 +76,20 @@ $github->get('/repos', [ "query" => [ "direction" => "desc" ] ]);
 
 ```
 
+### Automatic retries of failed requests
+
+You can configure the client to automatically retry requests in case of connection failure/timeout or 5xx error. Retry delay is exponential and with additional jitter.
+
+``` php
+$bearer = new Bearer\Client('BEARER_SECRET_KEY');
+$bearer->setMaxNetworkRetries(2); // maximum number of retries
+$bearer->setInitialNetworkRetryDelay(0.5); // initial delay
+$bearer->setMaxNetworkRetryDelay(2); // max delay between retries
+
+$github = $bearer->integration('github', []);
+$github->get('/repos', [ "query" => [ "direction" => "desc" ] ]);
+```
+
 [Learn more](https://docs.bearer.sh/working-with-bearer/manipulating-apis) on how to use custom functions with Bearer.sh.
 
 ## Development

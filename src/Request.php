@@ -210,7 +210,7 @@ class Request
     protected function sleepTime($numRetries, array $options) {
         $initialNetworkRetryDelay = $options['initialNetworkRetryDelay'];
         $maxNetworkRetryDelay = $options['maxNetworkRetryDelay'];
-        // expotential backoff with a limit of $maxNetworkRetryDelay
+        // exponential backoff with a limit of $maxNetworkRetryDelay
         $sleepSeconds = min(
             $initialNetworkRetryDelay * 1.0 * pow(2, $numRetries - 1),
             $maxNetworkRetryDelay
