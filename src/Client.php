@@ -4,29 +4,31 @@ namespace Bearer;
 
 class Client
 {
-
-    static $VERSION = "2.0.1";
+    static $VERSION = "3.0.0";
 
     protected $secretKey;
     protected $host = 'https://proxy.bearer.sh';
-    protected $httpClientSettings;
 
-    public function __construct($secretKey, $httpClientSettings = [CURLOPT_TIMEOUT => 5, CURLOPT_CONNECTTIMEOUT => 5])
+    protected $options = [];
+
+    public function __construct($secretKey, $options = [])
     {
         $this->setSecretKey($secretKey);
-        $this->setHttpClientSettings($httpClientSettings);
+        $this->options = array_merge([
+            'timeout' => 5,
+            'connectTimeout' => 5,
+            'httpClientConfig' => [],
+            'maxNetworkRetries' => 0,
+            'maxNetworkRetryDelay' => 2,
+            'initialNetworkRetryDelay' => 0.5,
+            'requestHandler' => null,
+            'logger' => null,
+        ], $options);
         return $this;
     }
 
     public function setSecretKey($apiKey)
     {
-        $this->secretKey = $apiKey;
-        return $this;
-    }
-
-    public function setApiKey($apiKey)
-    {
-        trigger_error('Please use Bearer\Client::setApiKey. Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
         $this->secretKey = $apiKey;
         return $this;
     }
@@ -37,25 +39,61 @@ class Client
         return $this;
     }
 
-    public function setHttpClientSettings($httpClientSettings)
+    public function setHttpClientConfig($httpClientConfig)
     {
-        $this->httpClientSettings = $httpClientSettings;
+        $this->options['httpClientConfig'] = $httpClientConfig;
         return $this;
     }
 
-    public function integration($id, $httpClientSettings = [])
+    public function setTimeout($timeout)
     {
-        if (is_array($httpClientSettings)) {
-            $httpClientSettings = array_replace($this->httpClientSettings, $httpClientSettings);
+        $this->options['timeout'] = $timeout;
+        return $this;
+    }
+
+    public function setConnectTimeout($connectTimeout)
+    {
+        $this->options['connectTimeout'] = $connectTimeout;
+        return $this;
+    }
+
+    public function setMaxNetworkRetries($maxRetries)
+    {
+        $this->options['maxNetworkRetries'] = $maxRetries;
+        return $this;
+    }
+
+    public function setMaxNetworkRetryDelay($maxRetryDelay)
+    {
+        $this->options['maxNetworkRetryDelay'] = $maxRetryDelay;
+        return $this;
+    }
+
+    public function setInitialNetworkRetryDelay($initialRetryDelay)
+    {
+        $this->options['initialNetworkRetryDelay'] = $initialRetryDelay;
+        return $this;
+    }
+
+    public function setRequestHandler($requestHandler)
+    {
+        $this->options['requestHandler'] = $requestHandler;
+        return $this;
+    }
+
+    public function integration($id, $options = [])
+    {
+        if (is_array($options)) {
+            $options = array_replace($this->options, $options);
         } else {
-            $httpClientSettings = [];
+            $options = [];
         }
 
         return new Integration(
             $id,
             $this->secretKey,
             $this->host,
-            $httpClientSettings
+            $this->options
         );
     }
 }

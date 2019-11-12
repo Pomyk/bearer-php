@@ -9,14 +9,25 @@ class Integration
     protected $authId;
     protected $setupId;
 
-    public function __construct($integrationId, $secretKey, $baseUrl, $httpClientSettings)
+    public function __construct($integrationId, $secretKey, $baseUrl, array $options)
     {
+        if (empty($options['requestHandler'])) {
+            $options['requestHandler'] = 'Bearer\RequestHandler';
+        }
         $this->config = [
             "integrationId" => $integrationId,
             "secretKey" => $secretKey,
             "baseUrl" => $baseUrl,
-            "httpClientSettings" => $httpClientSettings
-        ];
+        ] + $options;
+
+        $handler = $this->config['requestHandler'];
+        if (is_object($handler) || is_callable($handler)) {
+            return $this->handler = $handler;
+        } else if (is_string($handler) && class_exists($handler)) {
+            $this->handler = new $handler($this->config);
+        } else {
+            throw \Exception('Invalid request handler');
+        }
     }
 
 
@@ -42,19 +53,23 @@ class Integration
 
     /* Handle configuration */
 
-    protected function getConfig()
+    protected function getHeaders()
     {
-        $config = $this->config;
+        $headers = [];
+
+        if ($this->config['secretKey']) {
+            $headers['Authorization'] = $this->config['secretKey'];
+        }
 
         if ($this->authId) {
-            $config['authId'] = $this->authId;
+            $headers['Bearer-Auth-Id'] = $this->authId;
         }
 
         if ($this->setupId) {
-            $config['setupId'] = $this->setupId;
+            $headers['Bearer-Setup-Id'] = $this->setupId;
         }
 
-        return $config;
+        return $headers;
     }
 
     /* Main requests methods */
@@ -84,7 +99,15 @@ class Integration
     {
         $path = ($path[0] !== "/" ? "/" : "") . $path;
 
-        $request = new Request($method, $path, $params, $this->getConfig());
-        return $request->getResponse();
+        $integrationHeaders = $this->getHeaders();
+        $params['headers'] = array_merge(!empty($params['headers']) ? $params['headers'] : [], $integrationHeaders);
+
+        if (is_object($this->handler)) {
+            return $this->handler->execute($method, $path, $params);
+        } else if (is_callable($handler)) {
+            return call_user_func($handler, [$method, $path, $params, $this->config]);
+        } else {
+            throw \Exception('Invalid request handler');
+        }
     }
 }

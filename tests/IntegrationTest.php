@@ -4,42 +4,17 @@ namespace Bearer\Tests;
 
 use Bearer;
 
-require '_config.php';
-
-class IntegrationTest extends \PHPUnit_Framework_TestCase
+class IntegrationTest extends \PHPUnit\Framework\TestCase
 {
     private $testIntegration;
     private $testConfig;
 
-    public function setUp()
+    public function setUp(): void
     {
-        global $config;
-        $this->testConfig = $config;
+        $this->testConfig = require '_config.php';
 
-        $client = new Bearer\Client($this->testConfig['secretKey']);
+        $client = new Bearer\Client($this->testConfig['secretKey'], $this->testConfig['options']);
         $this->testIntegration = $client->integration($this->testConfig['integrationId']);
-    }
-
-    public function testSetAuth()
-    {
-        $authId = 'my-auth-id';
-
-        $client = new Bearer\Client($this->testConfig['secretKey']);
-        $integration = $client->integration($this->testConfig['integrationId']);
-        $integration->auth($authId);
-
-        $this->assertAttributeEquals($authId, "authId", $integration);
-    }
-
-    public function testSetSetup()
-    {
-        $setupId = 'my-setup-id';
-
-        $client = new Bearer\Client($this->testConfig['secretKey']);
-        $integration = $client->integration($this->testConfig['integrationId']);
-        $integration->setup($setupId);
-
-        $this->assertAttributeEquals($setupId, "setupId", $integration);
     }
 
     public function testCanMakeGetRequest()

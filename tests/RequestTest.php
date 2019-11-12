@@ -1,26 +1,29 @@
 <?php
 namespace Bearer\Tests;
-use Bearer;
-require '_config.php';
 
-class RequestTest extends \PHPUnit_Framework_TestCase
+use Bearer\RequestHandler;
+
+class RequestHandlerTest extends \PHPUnit\Framework\TestCase
 {
     private $testConfig;
-    private $testClient;
     private $testIntegration;
 
-    public function setUp()
+    public function setUp(): void
     {
-        global $config;
-        $this->testConfig = $config;
+        $this->testConfig = require '_config.php';
     }
 
     public function testMakesGetRequest() {
         $testConfig = $this->testConfig;
         $testConfig['baseUrl'] = 'https://example.org';
 
-        $this->testClient = new Bearer\Request('GET', '/', [], $testConfig);
+        $handler = new RequestHandler($testConfig);
+        $response = $handler->execute('GET', '/', []);
 
-        $this->assertTrue(!is_null($this->testClient->getResponse()));
+        $this->assertNotNull($response->getBody());
+        $this->assertNotEmpty($response->getHeaders());
+        $this->assertEquals(404, $response->getStatusCode());
     }
+
 }
+

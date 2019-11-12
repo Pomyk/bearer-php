@@ -1,25 +1,19 @@
 <?php
+
 namespace Bearer\Tests;
-use Bearer;
 
-require '_config.php';
+use Bearer\Client;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends \PHPUnit\Framework\TestCase
 {
     private $testClient;
     private $testConfig;
 
-    public function setUp()
+    public function setUp(): void
     {
-        global $config;
-        $this->testConfig = $config;
+        $this->testConfig = require '_config.php';
 
-        $this->testClient = new Bearer\Client($this->testConfig['secretKey']);
-    }
-
-    public function testDefaultHost()
-    {
-        $this->assertAttributeEquals($this->testConfig['host'], "host", $this->testClient);
+        $this->testClient = new Client($this->testConfig['secretKey'], $this->testConfig['options']);
     }
 
     public function testSetUpIntegration()
@@ -30,8 +24,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testErrorNoApiKey()
     {
-        $this->setExpectedException(\ArgumentCountError::class);
-        new Bearer\Client();
+        $this->expectException(\ArgumentCountError::class);
+        new Client();
     }
 
 }
